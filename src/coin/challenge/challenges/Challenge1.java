@@ -10,6 +10,7 @@ import java.awt.Color;
 
 import coin.challenge.bean.Image;
 import coin.challenge.utils.ImageUtils;
+import javax.swing.JOptionPane;
 
 public final class Challenge1 implements Challenge {
 
@@ -39,7 +40,7 @@ public final class Challenge1 implements Challenge {
         //
         for (int i = 0; i < image.getWidth(); i++) {
             for (int j = 0; j < image.getHeight(); j++) {
-                var c = new Color(matrix[i][j]);
+                Color c = new Color(matrix[i][j]);
                 if (c.getBlue() < 220) {
                     matrix[i][j] = new Color(255, 255, 255).getRGB();
                 } else {
@@ -47,57 +48,71 @@ public final class Challenge1 implements Challenge {
                 }
             }
         }
+        
         //
-        // Aplica a primeira dilatação na imagem
+        // Aplica erosão na imagem
         // 
-        for (int i = 2; i < image.getWidth() - 2; i++) {
-            for (int j = 2; j < image.getHeight() - 2; j++) {
-                if (new Color(matrix[i][j]).getRed()     == 255 &&
-                    new Color(matrix[i+1][j]).getRed()   == 255 && 
-                    new Color(matrix[i][j+1]).getRed()   == 255 &&
-                    new Color(matrix[i+1][j+1]).getRed() == 255) {
-                    for (int x = i - 2; x < i + 2; x++) {
-                        for (int y = j - 2; y < j + 2; y++) {
-                            matrix[x][y] = new Color(255, 255, 255).getRGB();
+        for(int z = 0; z < 0; z++){
+            for (int i = 2; i < image.getWidth() - 2; i++) {
+                for (int j = 2; j < image.getHeight() - 2; j++) {
+                    if (new Color(matrix[i][j]).getRed() != 255 ||
+                        new Color(matrix[i+1][j]).getRed() != 255 || 
+                        new Color(matrix[i][j+1]).getRed() != 255 ||
+                        new Color(matrix[i+1][j+1]).getRed() != 255) {
+                        for (int x = i - 2; x < i + 1; x++) {
+                            for (int y = j - 2; y < j + 1; y++) {
+                                matrix[x][y] = new Color(0, 0, 0).getRGB();
+                            }
                         }
                     }
                 }
             }
         }
+        
         //
-        // Aplica a primeira erosão na imagem
+        // Aplica dilatação na imagem
         // 
-        for (int i = 2; i < image.getWidth() - 2; i++) {
-            for (int j = 2; j < image.getHeight() - 2; j++) {
-                if (new Color(matrix[i][j]).getRed() != 255 ||
-                    new Color(matrix[i+1][j]).getRed() != 255 || 
-                    new Color(matrix[i][j+1]).getRed() != 255 ||
-                    new Color(matrix[i+1][j+1]).getRed() != 255) {
-                    for (int x = i - 2; x < i + 1; x++) {
-                        for (int y = j - 2; y < j + 1; y++) {
-                            matrix[x][y] = new Color(0, 0, 0).getRGB();
+        for(int z = 0; z < 1; z++){
+            for (int i = 2; i < image.getWidth() - 2; i++) {
+                for (int j = 2; j < image.getHeight() - 2; j++) {
+                    if (new Color(matrix[i][j]).getRed()     == 255 &&
+                        new Color(matrix[i+1][j]).getRed()   == 255 && 
+                        new Color(matrix[i][j+1]).getRed()   == 255 &&
+                        new Color(matrix[i+1][j+1]).getRed() == 255) {
+                        for (int x = i - 2; x < i + 2; x++) {
+                            for (int y = j - 2; y < j + 2; y++) {
+                                matrix[x][y] = new Color(255, 255, 255).getRGB();
+                            }
                         }
                     }
                 }
             }
-        }
+        } 
+        
         //
-        // Aplica a segunda erosão na imagem
-        // 
+        // Conta e mede as moedas
+        //
+        int actualColor = 0;
+        int coinLength = 0;
+        int actualCoinLength = 0;
         for (int i = 2; i < image.getWidth() - 2; i++) {
-            for (int j = 2; j < image.getHeight() - 2; j++) {
-                if (new Color(matrix[i][j]).getRed() != 255 ||
-                    new Color(matrix[i+1][j]).getRed() != 255 || 
-                    new Color(matrix[i][j+1]).getRed() != 255 ||
-                    new Color(matrix[i+1][j+1]).getRed() != 255) {
-                    for (int x = i - 2; x < i + 1; x++) {
-                        for (int y = j - 2; y < j + 1; y++) {
-                            matrix[x][y] = new Color(0, 0, 0).getRGB();
-                        }
-                    }
-                }
+                 for (int j = 2; j < image.getHeight() - 2; j++) {
+                     if (new Color(matrix[i][j]).getRed() == 255) {
+                         actualColor = 255;
+                         actualCoinLength++;
+                     }else if(new Color(matrix[i][j]).getRed() == 0 &&
+                             actualColor == 255) {
+                             actualColor = 0;
+                             if(actualCoinLength > coinLength)
+                                 coinLength = actualCoinLength;
+                             actualCoinLength = 0;
+                 }
+                     
             }
-        }        
+         }
+        
+        JOptionPane.showMessageDialog(null, "Tamanho Maior Moeda: " + coinLength);
+        
         // Imprime
         for (int i = 0; i < image.getWidth(); i++) {
             for (int j = 0; j < image.getHeight(); j++) {
