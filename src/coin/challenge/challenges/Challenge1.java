@@ -6,9 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import java.awt.image.BufferedImage;
-
-import static java.awt.image.BufferedImage.TYPE_BYTE_GRAY;
 import java.awt.Color;
 
 import coin.challenge.bean.Image;
@@ -16,15 +13,16 @@ import coin.challenge.utils.ImageUtils;
 import javax.swing.JOptionPane;
 
 /**
- * Restrições:
+ * Classe para a solução do desafio de contagem de moedas.
+ * 
+ * Requisitos para o funcionamento do algoritmo criado:
  * - As moedas não podem estar muito próximas/coladas
  * - Tem que seguir o mesmo tamanho das moedas contidos na imagem Moedas1.png 
  */
 public final class Challenge1 implements Challenge {
 
     /** Construtor do desafio 1 */
-    public Challenge1() {
-    }
+    public Challenge1() {}
 
     @Override
     public void solveChallenge() {
@@ -37,7 +35,6 @@ public final class Challenge1 implements Challenge {
         //
         Image image = optImage.get();
         int[][] matrix = image.getMatrix();
-        BufferedImage processed = new BufferedImage(image.getWidth(), image.getHeight(), TYPE_BYTE_GRAY);
         for (int i = 0; i < image.getWidth(); i++) {
             for (int j = 0; j < image.getHeight(); j++) {
                 Color c = new Color(matrix[i][j]);
@@ -63,9 +60,9 @@ public final class Challenge1 implements Challenge {
         for (int i = 2; i < image.getWidth() - 2; i++) {
             for (int j = 2; j < image.getHeight() - 2; j++) {
                 if (new Color(matrix[i][j]).getRed() == 255 &&
-                        new Color(matrix[i + 1][j]).getRed() == 255 &&
-                        new Color(matrix[i][j + 1]).getRed() == 255 &&
-                        new Color(matrix[i + 1][j + 1]).getRed() == 255) {
+                    new Color(matrix[i + 1][j]).getRed() == 255 &&
+                    new Color(matrix[i][j + 1]).getRed() == 255 &&
+                    new Color(matrix[i + 1][j + 1]).getRed() == 255) {
                     for (int x = i - 2; x < i + 2; x++) {
                         for (int y = j - 2; y < j + 2; y++) {
                             matrix[x][y] = new Color(255, 255, 255).getRGB();
@@ -75,7 +72,7 @@ public final class Challenge1 implements Challenge {
             }
         }
         //
-        // Conta e mede as moedas
+        // Conta o valor em reais das moedas medindo seus diâmetros
         //
         int diametro = 0;
         int raio = 0;
@@ -84,6 +81,9 @@ public final class Challenge1 implements Challenge {
             for (int j = 2; j < image.getWidth() - 2; j++) {
                 if (new Color(matrix[j][i]).getRed() == 255) {
                     int altura = i;
+                    //
+                    // Calcula a altura da moeda
+                    //
                     while (new Color(matrix[j][altura]).getRed() != 0) {
                         altura++;
                     }
@@ -93,6 +93,9 @@ public final class Challenge1 implements Challenge {
                     if (margem > image.getWidth()) {
                         margem = image.getWidth();
                     }
+                    //
+                    // Apaga da imagem a moeda processada 
+                    //
                     for (int y = i; y < altura * 1.05; y++) {
                         for (int x = j - raio; x < margem; x++) {
                             if (x < 0) {
@@ -101,20 +104,21 @@ public final class Challenge1 implements Challenge {
                             matrix[x][y] = new Color(0, 0, 0).getRGB();
                         }
                     }
+                    //
+                    // Adiciona no array de moedas a moeda processada
+                    //
                     array.add(diametro);
-                    System.out.println("Chegou em uma altura: " + diametro);
+                    //
+                    // Reposiciona os índicas para iniciar a leitura da imagem do ínício
+                    //
                     i = 2;
                     j = 2;
-                    // Imprime
-                    for (int f = 0; f < image.getWidth(); f++) {
-                        for (int g = 0; g < image.getHeight(); g++) {
-                            processed.setRGB(f, g, new Color(matrix[f][g]).getRGB());
-                        }
-                    }
-                    ImageUtils.writeImage(processed, PROCESSED_IMAGE_PATH);                    
                 }
             }
         }
+        //
+        // Calcula o valor da imagem a partir dos diâmetros das moedas
+        //
         double valor = 0;
         for (int i : array) {
             if (i >= 70) {
